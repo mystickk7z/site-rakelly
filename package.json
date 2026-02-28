@@ -1,0 +1,11 @@
+{
+  "name": "site-rakelly",
+  "version": "1.0.0",
+  "description": "Site especial para Rakelly",
+  "scripts": {
+    "start": "npx http-server -p $PORT"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
+  }
+}
