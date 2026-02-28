@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz do Amor ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff85c0 0%, #ffadd6 30%, #ffd4e8 60%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .floating-heart {
+            position: absolute;
+            font-size: 2em;
+            color: rgba(255, 107, 157, 0.6);
+            animation: float 15s infinite ease-in-out;
+            pointer-events: none;
+        }
+        
+        .static-heart {
+            position: absolute;
+            font-size: 2.5em;
+            color: rgba(255, 107, 157, 0.7);
+            pointer-events: none;
+            z-index: 1;
+            animation: sway 3s ease-in-out infinite;
+        }
+        
+        @keyframes sway {
+            0%, 100% {
+                transform: translateX(0) rotate(-5deg);
+            }
+            50% {
+                transform: translateX(20px) rotate(5deg);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .container {
+            background: transparent;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            position: relative;
+            overflow: visible;
+            z-index: 10;
+        }
+        
+        #start-screen, #quiz-screen, #result-screen, #final-screen {
+            background: transparent;
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        
+        h1 {
+            color: #7b8cde;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        p {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        #result-message {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        button {
+            background: #7b8cde;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(123, 140, 222, 0.4);
+            background: #6a7bc9;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        #progress {
+            height: 100%;
+            background: #7b8cde;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .question-container {
+            margin-bottom: 30px;
+        }
+        
+        #question {
+            font-size: 1.5em;
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        
+        #options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .option {
+            background: #f5f5f5;
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin: 0;
+        }
+        
+        .option:hover {
+            background: #e8e8e8;
+            transform: translateX(5px);
+        }
+        
+        .option.selected {
+            background: #7b8cde;
+            color: white;
+        }
+        
+        .option.correct {
+            background: #f5f5f5;
+            color: #333;
+            border: 3px solid #4caf50;
+        }
+        
+        .option.wrong {
+            background: #f5f5f5;
+            color: #333;
+            border: 3px solid #f44336;
+        }
+        
+        .option.extra-option {
+            background: #f5f5f5;
+            color: #333;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        .option.extra-option:hover {
+            background: #e8e8e8;
+        }
+        
+        .result-container {
+            text-align: center;
+        }
+        
+        #score {
+            font-size: 4em;
+            color: #7b8cde;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .hearts {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .heart {
+            font-size: 3em;
+            color: #ff6b9d;
+            animation: heartbeat 1.5s infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.1);
+            }
+            50% {
+                transform: scale(1);
+            }
+        }
+        
+        .final-container {
+            text-align: center;
+            position: relative;
+        }
+        
+        .photo-left, .photo-right {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 15px;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .photo-left-1 {
+            left: -230px;
+            top: 50px;
+        }
+        
+        .photo-left-2 {
+            left: -230px;
+            top: 280px;
+        }
+        
+        .photo-right-1 {
+            right: -230px;
+            top: 50px;
+        }
+        
+        .photo-right-2 {
+            right: -230px;
+            top: 280px;
+        }
+        
+        @media (max-width: 1000px) {
+            .photo-left, .photo-right {
+                position: relative;
+                left: 0 !important;
+                right: 0 !important;
+                top: 0 !important;
+                margin: 15px auto;
+                display: block;
+                width: 180px;
+                height: 180px;
+            }
+            
+            .final-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .love-letter {
+                order: 5;
+            }
+            
+            button {
+                order: 6;
+            }
+        }
+        
+        .final-message {
+            font-size: 1.8em;
+            color: #7b8cde;
+            margin: 30px 0;
+            font-weight: bold;
+            line-height: 1.5;
+        }
+        
+        .love-letter {
+            background: transparent;
+            padding: 30px;
+            border-radius: 15px;
+            border: none;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .love-letter p {
+            color: #333;
+            text-align: left;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .signature {
+            text-align: right;
+            font-style: italic;
+            color: #7b8cde;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Corações estáticos -->
+    <div class="static-heart" style="left: 5%; top: 10%; animation-delay: 0s;">❤️</div>
+    <div class="static-heart" style="left: 15%; top: 50%; animation-delay: 0.5s;">❤️</div>
+    <div class="static-heart" style="left: 10%; top: 80%; animation-delay: 1s;">❤️</div>
+    <div class="static-heart" style="right: 8%; top: 15%; animation-delay: 1.5s;">❤️</div>
+    <div class="static-heart" style="right: 15%; top: 60%; animation-delay: 2s;">❤️</div>
+    <div class="static-heart" style="right: 5%; top: 85%; animation-delay: 2.5s;">❤️</div>
+    
+    <div class="container">
+        <!-- Tela Inicial -->
+        <div id="start-screen" class="screen active">
+            <h1>Perguntas Para Minha Nenequinha</h1>
+            <p>Fiz esse quiz para saber se você me conhece mesmo!</p>
+            <button onclick="startQuiz()">Começar as Perguntas</button>
+        </div>
+        
+        <!-- Tela do Quiz -->
+        <div id="quiz-screen" class="screen">
+            <div class="progress-bar">
+                <div id="progress"></div>
+            </div>
+            <div class="question-container">
+                <h2 id="question"></h2>
+                <div id="options"></div>
+            </div>
+        </div>
+        
+        <!-- Tela de Resultado -->
+        <div id="result-screen" class="screen">
+            <div class="result-container">
+                <h1 id="result-title"></h1>
+                <p id="result-message"></p>
+            </div>
+        </div>
+        
+        <!-- Tela Final -->
+        <div id="final-screen" class="screen">
+            <div class="final-container">
+                <!-- Fotos do lado esquerdo -->
+                <img src="flor2.jpg" alt="Foto 1" class="photo-left photo-left-1">
+                <img src="nos2.jpg" alt="Foto 2" class="photo-left photo-left-2">
+                
+                <!-- Fotos do lado direito -->
+                <img src="flor1.jpg" alt="Foto 3" class="photo-right photo-right-1">
+                <img src="nos1.jpg" alt="Foto 4" class="photo-right photo-right-2">
+                
+                <div class="love-letter">
+                    <p>Fiz esse site pra descontrair o nosso relacionamento, mas falando sério agora quero te dizer uma coisa.</p>
+                    <p>Eu me arrependo de tudo o que eu fiz, de todas as mágoas que eu deixei no seu coração, de todas as vezes que te fiz chorar e que te deixei na incerteza do que você realmente queria.</p>
+                    <p>Quero fazer certo dessa vez, quero recomeçar do jeito certo, quero levar pra frente, ter um futuro com você e viver toda minha vida ao seu lado.</p>
+                    <p>Quero ter uma família, viajar o mundo juntos, te apresentar o que realmente é o amor, e vou te mostrar o que é amar por que EU TE AMO.</p>
+                    <p>Prometo fazer tudo diferente, prometo te dar a vida que sempre sonhou, prometo ser sincero independente de tudo, prometo te mostrar que o passado foi só uma dificuldade na nossa vida.</p>
+                    <p>Eu te amo, Rakelly.</p>
+                </div>
+                <button onclick="restartQuiz()">Fazer o Quiz Novamente</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // PERSONALIZE AQUI: Adicione suas próprias perguntas!
+        const questions = [
+            {
+                question: "Qual foi a música que marcou nosso relacionamento?",
+                options: [
+                    "Vem ser minha - Charlie Brown Jr.",
+                    "Nosso lugar - Mc Kevin, Thiago Castanho",
+                    "Os Anjos Cantam - Jorge e Mateus",
+                    "Chuva de arroz - Luan Santana"
+                ],
+                correct: 2
+            },
+            {
+                question: "Aonde nós nos conhecemos?",
+                options: [
+                    "No shopping",
+                    "No clube",
+                    "Na escola",
+                    "Em uma quadra"
+                ],
+                correct: 3
+            },
+            {
+                question: "Qual é minha comida favorita?",
+                options: [
+                    "Strogonoff",
+                    "Hambúrguer",
+                    "Sushi",
+                    "Parmegiana"
+                ],
+                correct: 0
+            },
+            {
+                question: "O que eu mais amo em você?",
+                options: [
+                    "Sua risada",
+                    "Seu jeito de ser",
+                    "Sua inteligência",
+                    "Tudo em você"
+                ],
+                correct: 3,
+                extraMessage: "(e principalmente sua risada)",
+                extraDelay: 4000,
+                extraOption: {
+                    text: "Seu xerecão grandão ❤️",
+                    delay: 2000
+                }
+            },
+            {
+                question: "Qual é o nosso sonho juntos?",
+                options: [
+                    "Viajar pelo mundo juntos",
+                    "Ter uma casa na praia",
+                    "Construir uma família",
+                    "Ter nossa casa própria"
+                ],
+                correct: 2
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+
+        function startQuiz() {
+            showScreen('quiz-screen');
+            currentQuestion = 0;
+            score = 0;
+            loadQuestion();
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function loadQuestion() {
+            selectedAnswer = null;
+            const question = questions[currentQuestion];
+            document.getElementById('question').textContent = question.question;
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            const oldExtraMessages = document.querySelectorAll('.extra-message, .additional-message');
+            oldExtraMessages.forEach(msg => msg.remove());
+            
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option';
+                button.textContent = option;
+                button.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(button);
+            });
+            
+            if (question.extraOption) {
+                setTimeout(() => {
+                    const button = document.createElement('button');
+                    button.className = 'option extra-option';
+                    button.textContent = question.extraOption.text;
+                    button.onclick = () => selectAnswer(question.options.length);
+                    optionsContainer.appendChild(button);
+                }, question.extraOption.delay);
+            }
+            
+            updateProgress();
+        }
+
+        function selectAnswer(index) {
+            if (selectedAnswer !== null) return;
+            
+            selectedAnswer = index;
+            const question = questions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            
+            if (question.extraOption && index === question.options.length) {
+                options[index].classList.add('selected');
+                let message = document.querySelector('.extra-message');
+                if (!message) {
+                    message = document.createElement('p');
+                    message.className = 'extra-message';
+                    message.textContent = 'Achou mesmo que ia ser isso? Tente novamente bobinha';
+                    message.style.color = '#7b8cde';
+                    message.style.textAlign = 'center';
+                    message.style.marginTop = '20px';
+                    message.style.fontSize = '1.1em';
+                    message.style.fontWeight = 'bold';
+                    message.style.animation = 'fadeIn 0.5s ease';
+                    document.querySelector('.question-container').appendChild(message);
+                }
+                setTimeout(() => {
+                    options[index].classList.remove('selected');
+                    selectedAnswer = null;
+                }, 1000);
+                return;
+            }
+            
+            options[index].classList.add('selected');
+            
+            setTimeout(() => {
+                if (index === question.correct) {
+                    options[index].classList.add('correct');
+                    score++;
+                    
+                    const extraMessage = document.querySelector('.extra-message');
+                    if (extraMessage) {
+                        extraMessage.remove();
+                    }
+                    
+                    if (question.extraMessage) {
+                        const additionalMessage = document.createElement('p');
+                        additionalMessage.className = 'additional-message';
+                        additionalMessage.textContent = question.extraMessage;
+                        additionalMessage.style.color = '#7b8cde';
+                        additionalMessage.style.textAlign = 'center';
+                        additionalMessage.style.marginTop = '15px';
+                        additionalMessage.style.fontSize = '1.1em';
+                        additionalMessage.style.fontStyle = 'italic';
+                        additionalMessage.style.animation = 'fadeIn 0.5s ease';
+                        document.querySelector('.question-container').appendChild(additionalMessage);
+                    }
+                    
+                    const delay = question.extraDelay || 1500;
+                    setTimeout(() => {
+                        currentQuestion++;
+                        if (currentQuestion < questions.length) {
+                            loadQuestion();
+                        } else {
+                            showResults();
+                        }
+                    }, delay);
+                } else {
+                    options[index].classList.add('wrong');
+                    options[question.correct].classList.add('correct');
+                    setTimeout(() => {
+                        currentQuestion++;
+                        if (currentQuestion < questions.length) {
+                            loadQuestion();
+                        } else {
+                            showResults();
+                        }
+                    }, 1500);
+                }
+            }, 300);
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+        }
+
+        function showResults() {
+            showScreen('result-screen');
+            const percentage = (score / questions.length) * 100;
+            
+            let title;
+            if (percentage === 100) {
+                title = "Que gracinha, fico feliz!";
+            } else if (percentage >= 80) {
+                title = "Muito Bem!";
+            } else if (percentage >= 60) {
+                title = "Bom Trabalho!";
+            } else {
+                title = "Ainda Aprendendo!";
+            }
+            document.getElementById('result-title').textContent = title;
+            
+            const resultMessage = document.getElementById('result-message');
+            resultMessage.textContent = '';
+            resultMessage.style.opacity = '0';
+            resultMessage.style.transition = 'opacity 1s ease';
+            
+            setTimeout(() => {
+                resultMessage.textContent = 'Achou que era só isso?';
+                resultMessage.style.color = '#7b8cde';
+                resultMessage.style.fontSize = '1.3em';
+                resultMessage.style.fontWeight = 'bold';
+                
+                setTimeout(() => {
+                    resultMessage.style.opacity = '1';
+                }, 100);
+                
+                setTimeout(() => {
+                    resultMessage.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        resultMessage.textContent = 'Tenho mais uma coisinha para te mostrar';
+                        resultMessage.style.fontSize = '1.2em';
+                        resultMessage.style.fontWeight = 'normal';
+                        
+                        setTimeout(() => {
+                            resultMessage.style.opacity = '1';
+                        }, 100);
+                        
+                        setTimeout(() => {
+                            resultMessage.style.opacity = '0';
+                            
+                            setTimeout(() => {
+                                resultMessage.textContent = 'Mas antes, clique em todos os seis corações da tela até desaparecer para continuar';
+                                resultMessage.style.color = '#ff6b9d';
+                                resultMessage.style.fontSize = '1.1em';
+                                
+                                setTimeout(() => {
+                                    resultMessage.style.opacity = '1';
+                                    enableHeartClicking();
+                                }, 100);
+                            }, 500);
+                        }, 3000);
+                    }, 1000);
+                }, 3000);
+            }, 1000);
+        }
+
+        let heartsClicked = 0;
+        function enableHeartClicking() {
+            const hearts = document.querySelectorAll('.static-heart');
+            hearts.forEach((heart) => {
+                heart.style.cursor = 'pointer';
+                heart.style.pointerEvents = 'auto';
+                heart.onclick = () => {
+                    heart.style.animation = 'fadeOut 0.5s ease';
+                    heart.style.opacity = '0';
+                    heartsClicked++;
+                    
+                    if (heartsClicked === 6) {
+                        setTimeout(() => {
+                            showFinalScreen();
+                        }, 500);
+                    }
+                };
+            });
+        }
+
+        function showFinalScreen() {
+            showScreen('final-screen');
+        }
+
+        function restartQuiz() {
+            showScreen('start-screen');
+        }
+    </script>
+</body>
+</html>
