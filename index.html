@@ -38,6 +38,12 @@
             pointer-events: none;
             z-index: 1;
             animation: sway 3s ease-in-out infinite;
+            display: none;
+        }
+        
+        #result-screen.active ~ body .static-heart,
+        .result-screen-active .static-heart {
+            display: block;
         }
         
         @media (max-width: 768px) {
@@ -685,6 +691,7 @@
 
         function showResults() {
             showScreen('result-screen');
+            document.querySelectorAll('.static-heart').forEach(h => h.style.display = 'block');
             const percentage = (score / questions.length) * 100;
             
             let title;
